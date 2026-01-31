@@ -12,7 +12,7 @@ DPI=${DPI:-""}
 KEYMAP=${KEYMAP:-""}
 
 
-groupadd -g "${USER_GID}" "${USER_NAME}"
+groupadd -fg "${USER_GID}" "${USER_NAME}"
 useradd -u "${USER_UID}" -g "${USER_GID}" -G sudo -p "${USER_PASSWD}" -m -d "${USER_HOME}" -s /bin/bash "${USER_NAME}"
 
 ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime
