@@ -1,4 +1,4 @@
-FROM ubuntu:noble-20260113
+FROM ubuntu:noble-20260217
 
 RUN userdel -r ubuntu
 RUN dpkg --add-architecture i386 \
