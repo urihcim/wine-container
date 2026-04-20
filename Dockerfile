@@ -1,22 +1,25 @@
-FROM ubuntu:noble-20260324
+FROM debian:trixie-20260406-slim
 
-RUN userdel -r ubuntu
-RUN dpkg --add-architecture i386 \
+RUN DEBIAN_FRONTEND="noninteractive" \
+    && dpkg --add-architecture i386 \
     && apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
         dwm \
-        fonts-noto-cjk \
-        gosu \
-        locales-all \
+        locales \
         stterm \
         suckless-tools \
         sudo \
-        vim \
+        vim-tiny \
         xorgxrdp \
         xrdp \
         wine \
         wine32 \
     && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -G sudo -s /bin/bash -m -d /home/wine wine \
+    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/wine
+
+EXPOSE 3889
 
 COPY x-terminal-emulator.sh /usr/local/bin/x-terminal-emulator
 COPY entrypoint.sh /entrypoint

@@ -1,22 +1,21 @@
 #!/bin/bash
 set -euo pipefail
 
-USER_NAME=${USER_NAME:-wineuser}
-USER_PASSWD=${USER_PASSWD:-"$(openssl passwd -1 -salt "$(openssl rand -base64 6)" "${USER_NAME}")"}
-USER_HOME=${USER_HOME:-/home/"${USER_NAME}"}
+USER_NAME=${USER_NAME:-wine}
+USER_PASSWD="${USER_PASSWD:-${USER_NAME}}"
 USER_UID=${USER_UID:-1000}
 USER_GID=${USER_GID:-"${USER_UID}"}
 RUN_AS_ROOT=${RUN_AS_ROOT:-""}
 TZ=${TZ:-UTC}
+LANG=${LANG:-POSIX}
 DPI=${DPI:-""}
 KEYMAP=${KEYMAP:-""}
 
-
-groupadd -fg "${USER_GID}" "${USER_NAME}"
-useradd -u "${USER_UID}" -g "${USER_GID}" -G sudo -p "${USER_PASSWD}" -m -d "${USER_HOME}" -s /bin/bash "${USER_NAME}"
-
 ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime
-echo "${TZ}" > /etc/timezone
+update-locale LANG=${LANG}
+
+usermod -u $USER_UID -g $USER_GID $USER_NAME
+echo "${USER_NAME}:${USER_NAME}" | chpasswd
 
 if [ -n "${DPI}" ]; then
     sed -i "
@@ -32,8 +31,7 @@ if [ -n "${KEYMAP}" ]; then
     }" /etc/xrdp/xrdp_keyboard.ini
 fi
 
-rm -f /var/run/xrdp/xrdp-sesman.pid
-rm -f /var/run/xrdp/xrdp.pid
+rm -f /var/run/xrdp/xrdp*.pid
 
 xrdp-sesman
 
@@ -45,6 +43,6 @@ else
     if [ -n "${RUN_AS_ROOT}" ]; then
         exec "$@"
     else
-        exec gosu "${USER_NAME}" "$@"
+        exec setpriv --reuid=$USER_UID --regid=$USER_GID --init-groups -- "$@"
     fi
 fi

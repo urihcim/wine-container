@@ -1,0 +1,14 @@
+services:
+  wine:
+    build: .
+    environment:
+      - TZ=Asia/Tokyo
+      - LANG=ja_JP.UTF-8
+      - DPI=120
+      - KEYMAP=en:0xe0010411
+    ports:
+      - 3389:3389
+    volumes:
+      - /usr/lib/locale:/usr/lib/locale:ro
+      - /usr/share/fonts:/usr/local/share/fonts:ro
+      - ./wine:/home/wine/.wine
