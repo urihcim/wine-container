@@ -1,4 +1,4 @@
-# wine-docker
+# wine-container
 
 This project provides a Docker environment for running Wine, a compatibility layer for running Windows applications on Linux.  
 It also includes xrdp for remote desktop access via RDP.  
@@ -14,13 +14,13 @@ With this container, you can easily run Windows programs and access a Linux desk
 ### Build the Docker image
 
 ```sh
-docker build -t wine-docker .
+docker build -t wine-container .
 ```
 
 ### Start a desktop session and connect via Remote Desktop (xrdp)
 
 ```sh
-docker run -it -p 3389:3389 wine-docker /bin/bash
+docker run -it -p 3389:3389 wine-container /bin/bash
 ```
 
 - Connect to `localhost:3389` using any RDP client.
