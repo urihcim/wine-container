@@ -14,8 +14,8 @@ KEYMAP=${KEYMAP:-""}
 ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime
 update-locale LANG=${LANG}
 
-groupmod -g $USER_GID $USER_NAME
-usermod -u $USER_UID -g $USER_GID $USER_NAME
+groupmod -g ${USER_GID} ${USER_NAME}
+usermod -u ${USER_UID} -g ${USER_GID} ${USER_NAME}
 echo "${USER_NAME}:${USER_NAME}" | chpasswd
 
 if [ -n "${DPI}" ]; then
@@ -44,6 +44,6 @@ else
     if [ -n "${RUN_AS_ROOT}" ]; then
         exec "$@"
     else
-        exec setpriv --reuid=$USER_UID --regid=$USER_GID --init-groups -- "$@"
+        exec gosu ${USER_NAME} "$@"
     fi
 fi
