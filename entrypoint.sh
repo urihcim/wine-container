@@ -14,6 +14,7 @@ KEYMAP=${KEYMAP:-""}
 ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime
 update-locale LANG=${LANG}
 
+groupmod -g $USER_GID $USER_NAME
 usermod -u $USER_UID -g $USER_GID $USER_NAME
 echo "${USER_NAME}:${USER_NAME}" | chpasswd
 
