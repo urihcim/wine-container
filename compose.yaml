@@ -12,3 +12,11 @@ services:
       - /usr/lib/locale:/usr/lib/locale:ro
       - /usr/share/fonts:/usr/local/share/fonts:ro
       - ./wine:/home/wine/.wine
+    command:
+      - /bin/bash
+      - -c
+      - |
+        set -euo pipefail
+        display=$(xrdp-sesrun -p wine wine | tee >(cat >&2) | grep -oP 'display=\K:\d+' || exit 1)
+        export DISPLAY=$${display}
+        winecfg
