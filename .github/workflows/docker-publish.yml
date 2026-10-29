@@ -8,8 +8,12 @@ on:
       - ".github/**"
   pull_request:
     branches: [ main ]
+    # Release PRs only touch these files, and runs triggered by the
+    # release-please bot would wait for manual approval.
     paths-ignore:
       - ".github/**"
+      - "CHANGELOG.md"
+      - ".release-please-manifest.json"
   workflow_dispatch:
 
 jobs:
