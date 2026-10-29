@@ -41,7 +41,7 @@ docker run -it -p 3389:3389 wine-container /bin/bash
 Releases are automated with [release-please](https://github.com/googleapis/release-please).
 
 1. Commits on `main` follow [Conventional Commits](https://www.conventionalcommits.org/). Dependabot uses `fix(deps):` for Docker updates and `chore(deps):` for GitHub Actions updates.
-2. release-please keeps a release PR open that bumps `version.txt` and updates `CHANGELOG.md`. `fix` bumps the patch version, `feat` bumps the minor version, and a breaking change bumps the major version.
+2. release-please keeps a release PR open that bumps `.release-please-manifest.json` and updates `CHANGELOG.md`. `fix` bumps the patch version, `feat` bumps the minor version, and a breaking change bumps the major version.
 3. Merging the release PR creates the `v*` tag and GitHub Release, and dispatches the image build for that tag.
 
 Images are published to `ghcr.io/urihcim/wine`: `X.Y.Z` for each release and `latest` for the head of `main`.
