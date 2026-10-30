@@ -3,6 +3,7 @@ name: Release Please
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 # Serialize runs so that merging several PRs at once does not race on
 # creating the same release PR.
