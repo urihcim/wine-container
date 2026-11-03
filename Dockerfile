@@ -1,4 +1,4 @@
-FROM debian:trixie-20261020-slim
+FROM debian:trixie-20261027-slim
 
 RUN DEBIAN_FRONTEND="noninteractive" \
     && dpkg --add-architecture i386 \
