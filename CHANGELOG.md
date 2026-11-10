@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/urihcim/wine-container/compare/v1.0.3...v1.0.4) (2026-11-10)
+
+
+### Bug Fixes
+
+* **deps:** bump debian from trixie-20261027-slim to trixie-20261104-slim ([#41](https://github.com/urihcim/wine-container/issues/41)) ([c9459bb](https://github.com/urihcim/wine-container/commit/c9459bbbb38251cda5e9bd9b43df1f446a3fee6d))
+
 ## [1.0.3](https://github.com/urihcim/wine-container/compare/v1.0.2...v1.0.3) (2026-11-03)
 
 
