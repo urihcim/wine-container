@@ -35,6 +35,16 @@ docker run -it -p 3389:3389 wine-container /bin/bash
 - `RUN_AS_ROOT`: Run commands as root if set
 - `DPI`: DPI setting for the desktop (e.g., 96, 120)
 - `KEYMAP`: Keyboard layout for xrdp (e.g., en:0xe0010411)
+- `HODLL`: Emulator for 32-bit applications on `linux/arm64` (default: libwow64fex.dll)
+
+## Architectures
+
+Images are published for `linux/amd64` and `linux/arm64`.
+
+- `linux/amd64` uses Wine from Debian with `wine32`, so the prefix is 32-bit.
+- `linux/arm64` uses [Hangover](https://github.com/AndreRH/hangover), a native arm64 Wine that emulates only the x86 code of the application. The prefix is 64-bit, so 32-bit applications are installed under `Program Files (x86)`, and a prefix created on `linux/amd64` cannot be reused.
+
+On `linux/arm64`, 32-bit applications run on FEX by default. Set the environment variable `HODLL=wowbox64.dll` on the container to use Box64 instead, or prefix a single command with it.
 
 ## Releases
 
