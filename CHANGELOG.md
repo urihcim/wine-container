@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/urihcim/wine-container/compare/v1.0.4...v1.1.0) (2026-11-14)
+
+
+### Features
+
+* add arm64 image built on Hangover ([#44](https://github.com/urihcim/wine-container/issues/44)) ([89d37b2](https://github.com/urihcim/wine-container/commit/89d37b2b1cdf174eda7961849440e235ebb65483))
+
+
+### Bug Fixes
+
+* **deps:** bump hangover from 11.9 to 11.16 ([#47](https://github.com/urihcim/wine-container/issues/47)) ([4ec4c34](https://github.com/urihcim/wine-container/commit/4ec4c34683319932335dc86cdc1cb0496e79456c))
+
 ## [1.0.4](https://github.com/urihcim/wine-container/compare/v1.0.3...v1.0.4) (2026-11-10)
 
 
