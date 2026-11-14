@@ -50,7 +50,7 @@ On `linux/arm64`, 32-bit applications run on FEX by default. Set the environment
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please).
 
-1. Commits on `main` follow [Conventional Commits](https://www.conventionalcommits.org/). Dependabot uses `fix(deps):` for Docker updates and `chore(deps):` for GitHub Actions updates.
+1. Commits on `main` follow [Conventional Commits](https://www.conventionalcommits.org/). Dependabot uses `fix(deps):` for Docker updates and `chore(deps):` for GitHub Actions updates. The Hangover Update workflow opens a `fix(deps):` pull request when a new Hangover release is available.
 2. release-please keeps a release PR open that bumps `.release-please-manifest.json` and updates `CHANGELOG.md`. `fix` bumps the patch version, `feat` bumps the minor version, and a breaking change bumps the major version.
 3. Merging the release PR creates the `v*` tag and GitHub Release, and dispatches the image build for that tag.
 
