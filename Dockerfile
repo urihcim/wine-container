@@ -1,4 +1,4 @@
-ARG HANGOVER_VERSION=11.9
+ARG HANGOVER_VERSION=11.16
 
 FROM debian:trixie-20261104-slim AS base
 
@@ -32,7 +32,7 @@ RUN DEBIAN_FRONTEND="noninteractive" \
 FROM base AS wine-arm64
 
 ARG HANGOVER_VERSION
-ADD --checksum=sha256:896918679daa53d6d3a6a1c40132cd35a1d9edc7afdbc643f9bbb3e22b114348 \
+ADD --checksum=sha256:b5493f5903ab3c05f78bf4c03b06ac0005eb26f732437748c1592fefa45e861a \
     https://github.com/AndreRH/hangover/releases/download/hangover-${HANGOVER_VERSION}/hangover_${HANGOVER_VERSION}_debian13_trixie_arm64.tar \
     /tmp/hangover.tar
 
