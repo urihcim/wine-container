@@ -1,0 +1,115 @@
+name: Hangover Update
+
+# Dependabot only tracks the base image, so follow Hangover releases here:
+# open a pull request that bumps the version and the checksum of the release
+# tarball in the Dockerfile.
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: hangover-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UPSTREAM: AndreRH/hangover
+      # Must match the Debian release of the base image.
+      DISTRO: debian13_trixie
+      # Wait a few days after a release, as Dependabot does.
+      COOLDOWN_DAYS: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Find the latest release
+        id: release
+        run: |
+          current="$(sed -n 's/^ARG HANGOVER_VERSION=//p' Dockerfile)"
+          release="$(gh api "repos/${UPSTREAM}/releases/latest")"
+          latest="$(jq -r '.tag_name' <<<"${release}")"
+          latest="${latest#hangover-}"
+          published="$(jq -r '.published_at' <<<"${release}")"
+
+          if ! [[ "${current}" =~ ^[0-9]+(\.[0-9]+)*$ && "${latest}" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "::error::Unexpected version: current '${current}', latest '${latest}'"
+            exit 1
+          fi
+
+          echo "current=${current}" >> "${GITHUB_OUTPUT}"
+          echo "latest=${latest}" >> "${GITHUB_OUTPUT}"
+          echo "branch=deps/hangover-${latest}" >> "${GITHUB_OUTPUT}"
+
+          newest="$(printf '%s\n' "${current}" "${latest}" | sort -V | tail -n 1)"
+          age=$(( ($(date +%s) - $(date -d "${published}" +%s)) / 86400 ))
+          if [ "${latest}" = "${current}" ] || [ "${newest}" != "${latest}" ]; then
+            echo "Hangover ${current} is up to date."
+          elif [ "${age}" -lt "${COOLDOWN_DAYS}" ]; then
+            echo "Hangover ${latest} was released ${age} days ago; waiting."
+          elif git ls-remote --exit-code --heads origin "deps/hangover-${latest}" > /dev/null; then
+            # Closing the pull request without deleting its branch skips
+            # that version.
+            echo "Branch deps/hangover-${latest} already exists."
+          else
+            echo "update=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Update the Dockerfile
+        if: steps.release.outputs.update == 'true'
+        env:
+          CURRENT: ${{ steps.release.outputs.current }}
+          LATEST: ${{ steps.release.outputs.latest }}
+        run: |
+          asset="hangover_${LATEST}_${DISTRO}_arm64.tar"
+          gh release download "hangover-${LATEST}" --repo "${UPSTREAM}" \
+            --pattern "${asset}" --dir "${RUNNER_TEMP}"
+          checksum="$(sha256sum "${RUNNER_TEMP}/${asset}" | cut -d ' ' -f 1)"
+
+          sed -i \
+            -e "s/^ARG HANGOVER_VERSION=.*/ARG HANGOVER_VERSION=${LATEST}/" \
+            -e "s/--checksum=sha256:[0-9a-f]\{64\}/--checksum=sha256:${checksum}/" \
+            Dockerfile
+
+          if [ "$(git diff --numstat Dockerfile | cut -f 1)" != "2" ]; then
+            echo "::error::Expected exactly two changed lines in the Dockerfile"
+            git diff
+            exit 1
+          fi
+
+      - name: Open a pull request
+        if: steps.release.outputs.update == 'true'
+        env:
+          CURRENT: ${{ steps.release.outputs.current }}
+          LATEST: ${{ steps.release.outputs.latest }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+        run: |
+          title="fix(deps): bump hangover from ${CURRENT} to ${LATEST}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${BRANCH}"
+          git commit -m "${title}" Dockerfile
+          git push origin "${BRANCH}"
+
+          gh pr create --base "${GITHUB_REF_NAME}" --head "${BRANCH}" \
+            --title "${title}" \
+            --body "Bumps [Hangover](https://github.com/${UPSTREAM}) from ${CURRENT} to ${LATEST}.
+
+          Release notes: https://github.com/${UPSTREAM}/releases/tag/hangover-${LATEST}
+
+          The image built from this branch is published as \`ghcr.io/${GITHUB_REPOSITORY_OWNER}/wine:${BRANCH//\//-}\` for testing on arm64 before the merge."
+
+          # Pull requests opened with GITHUB_TOKEN do not trigger other
+          # workflows, so dispatch the image build explicitly.
+          gh workflow run docker-publish.yml --repo "${GITHUB_REPOSITORY}" --ref "${BRANCH}"
